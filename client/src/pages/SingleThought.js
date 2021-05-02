@@ -6,6 +6,9 @@ import ReactionList from '../components/ReactionList';
 import { useQuery } from '@apollo/react-hooks';
 import { QUERY_THOUGHT } from '../utils/queries';
 
+import Auth from '../utils/auth';
+import ReactionForm from '../components/ReactionForm';
+
 const SingleThought = props => {
   const { id: thoughtId } = useParams();
 
@@ -18,6 +21,22 @@ const SingleThought = props => {
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  const [reactionBody, setBody] = useState('');
+  const [characterCount, setCharacterCount] = useState(0);
+
+  const handleChange = event => {
+    if (event.target.value.length <= 280) {
+      setBody(event.target.value);
+      setCharacterCount(event.target.value.length);
+    }
+  };
+
+  const handleFormSubmit = async event => {
+    event.preventDefault();
+    setBody('');
+    setCharacterCount(0);
+  };
 
   return (
     <div>
@@ -34,6 +53,7 @@ const SingleThought = props => {
       </div>
 
       {thought.reactionCount > 0 && <ReactionList reactions={thought.reactions} />}
+      {Auth.loggedIn() && <ReactionForm thoughtId={thought._id} />}
     </div>
   );
 };
